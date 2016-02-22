@@ -1,5 +1,6 @@
 # std lib
 import os
+import re
 from datetime import datetime, timedelta
 
 # note that the milliseconds portion is dropped
@@ -178,3 +179,73 @@ def getbookmarkid(line):
 	if matches and matches.group(1):
 		bookmarkid = matches.group(1)
 	return bookmarkid
+
+def loadchunks(lines):
+	"""
+	give a list of lines concatenated from multiple log files, find
+	the natural chunks, defined as starting with a session load or
+	a new day 
+	
+	input: iterable over log lines
+	output: iterator that returns lists of lines belonging to one "chunk"
+	"""
+	chunk = []
+	oldline = None
+	date_pattern = re.compile("^20[0-9][0-9]-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}")
+
+	for line in lines:
+		#strip off loglevel
+		l = line[loglevellength:].rstrip()
+		#check if line starts with timestamp, if not discard
+		if (date_pattern.match(l)):
+			if oldline:
+				# when to begin a new chunk?
+				if "Start NeuTu - FlyEM" in l: 
+					if "Exit NeuTu" in oldline:
+						end_type = "close"
+					else:
+						end_type = "crash"
+					yield (end_type, chunk)
+					chunk = []
+				elif not sameday(oldline, l):
+					end_type = "new_day"
+					yield (end_type, chunk)
+					chunk = []				
+			oldline = l
+			chunk.append(line)
+	end_type = "working"
+	yield (end_type, chunk)
+
+def daychunks(lines):
+	"""
+	give a list of lines concatenated from multiple log files, find
+	the chunks for each new day 
+	
+	input: iterable over log lines
+	output: iterator that returns lists of lines belonging to one "chunk"
+	"""
+	chunk = []
+	oldline = None
+	date_pattern = re.compile("^20[0-9][0-9]-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}")
+
+	for line in lines:
+		#strip off loglevel
+		l = line[loglevellength:].rstrip()
+		#check if line starts with timestamp, if not discard
+		if (date_pattern.match(l)):
+			if oldline:
+				# when to begin a new chunk?
+				if not sameday(oldline, l):
+					yield chunk
+					chunk = []				
+			oldline = l
+			chunk.append(line)
+	yield chunk
+
+def sameday(oldline, line):
+	oldtime = gettimestamp(oldline)
+	newtime = gettimestamp(line)
+	if oldtime.day != newtime.day:
+		return False
+	else:
+		return True
