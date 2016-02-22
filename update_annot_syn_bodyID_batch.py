@@ -17,7 +17,7 @@ import os
 
 # ------------------------ function to retrieve body ids -------------
 def get_dvid_body_ids( synapse_locations, dvid_server, bodylabeldata, write_count ):
-    coords_temp = "/groups/flyem/home/flyem/bin/python/coords_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
+    coords_temp = "coords_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
     with open(coords_temp, 'wt') as f:
         json.dump(synapse_locations, f, indent=2)
     dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  labelblk + "/labels"
