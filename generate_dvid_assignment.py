@@ -25,9 +25,9 @@ def load_assignment_dvid (json_data, dvid_server, dvid_uuid, keyvalue_name, key_
     dvid_request_url = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + keyvalue_name + "/key/" + key_name
     print "dvid post url: " + dvid_request_url
     data = open(assign_json,'rb').read()
-    #res = requests.post(url=dvid_request_url,data=data)
-    #print "Done posting " + assign_json 
-    #os.remove(assign_json)
+    res = requests.post(url=dvid_request_url,data=data)
+    print "Done posting " + assign_json 
+    os.remove(assign_json)
 
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
