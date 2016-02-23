@@ -23,7 +23,7 @@ def get_dvid_body_ids( synapse_locations, dvid_server, bodylabeldata, write_coun
     dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  labelblk + "/labels"
     print "dvid url " + dvid_request_url    
     data = open(coords_temp,'rb').read()
-    res = requests.post(url=dvid_request_url,data=data)
+    res = requests.get(url=dvid_request_url,data=data)
     thisbodylabeldata = json.loads(res.text)
     #print "this body labels " + str(len(thisbodylabeldata))
     bodylabeldata.extend(thisbodylabeldata)
