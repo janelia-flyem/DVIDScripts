@@ -192,7 +192,7 @@ def parsegeneral(logs):
 			results['timeseries']['daily'][day]['splits'] += daily_log[day]['splits']
 		results['overall']['merges'] += action_log['merges']
 		results['overall']['splits'] += action_log['splits']
-	pprint(results)
+
 
 
 
@@ -223,6 +223,5 @@ if __name__ == '__main__':
 	log_locations = [l for l in nt.getloglocations(args.directory)]
 	# Parse overall data
 	parsegeneral(log_locations)
-
-
-	# Parse timeseries data
+	with open(args.output_file, 'w') as output:
+		json.dump(results, output)
