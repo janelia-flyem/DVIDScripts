@@ -48,6 +48,10 @@ if __name__ == '__main__':
     export_synapses_psds = {}
     for synapse in synapsedata:
         #print "here " + synapse["Kind"] 
+        pos = synapse["Pos"]
+        if synapse["Tags"] is None:
+            print synapse["Kind"] + " missing Tags at: " + str(pos[0]) + "," +str(pos[1]) + "," +str(pos[2])
+            continue
         tags = synapse["Tags"]
         syn_id = tags[0]
         #print "here " + tags[0]
