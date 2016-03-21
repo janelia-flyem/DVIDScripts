@@ -49,17 +49,20 @@ if __name__ == '__main__':
     for synapse in synapsedata:
         #print "here " + synapse["Kind"] 
         pos = synapse["Pos"]
-        if synapse["Tags"] is None:
-            print synapse["Kind"] + " missing Tags at: " + str(pos[0]) + "," +str(pos[1]) + "," +str(pos[2])
-            continue
-        tags = synapse["Tags"]
-        syn_id = tags[0]
-        #print "here " + tags[0]
+        
         # deal with presyn
         if synapse["Kind"] == "PreSyn":
+            syn_id = str(pos[0]) + "_" + str(pos[1]) + "_" + str(pos[2])
+            #print "Tbar: " + syn_id
             export_synapse_tbars[syn_id] = synapse
         # deal with postsyn
         if synapse["Kind"] == "PostSyn":
+            # this is an array
+            rels = synapse["Rels"]
+            presynto = rels[0]
+            presyncoord = presynto["To"]
+            syn_id = str(presyncoord[0]) + "_" + str(presyncoord[1]) + "_" + str(presyncoord[2])
+            #print "\tPSD to: " + syn_id
             check_psd = export_synapses_psds.get(syn_id)
             if check_psd:
                 psd_grouped = export_synapses_psds[syn_id]
@@ -80,12 +83,20 @@ if __name__ == '__main__':
         presyn_data = export_synapse_tbars[syn_key]
         tbar_pos = presyn_data['Pos']
         tbar_properties = presyn_data['Prop']
-        tbar_confidence = tbar_properties['conf']
+        tbar_confidence = 1
+        if ('confidence' in tbar_properties):
+            tbar_confidence = tbar_properties['conf']
+        tbar_user = "";
+        if ('agent' in tbar_properties):
+            tbar_user = tbar_properties['agent']
+        if ('user' in tbar_properties):
+            tbar_user = tbar_properties['user']
         #print "x " + str(tbar_pos[0])
         this_synapse_data = {}
         
         this_tbar_data = {}
         this_tbar_data["status"] = "final"
+        this_tbar_data["user"] = tbar_user
         this_tbar_data['confidence'] = float(tbar_confidence)
         this_tbar_data['body ID'] = -1
         this_tbar_data['location'] = tbar_pos
@@ -106,10 +117,18 @@ if __name__ == '__main__':
             postsyn_array = export_synapses_psds[syn_key]
             for postsyn_data in postsyn_array:
                 psd_properties = postsyn_data['Prop']
-                psd_confidence = psd_properties['conf']
+                psd_confidence = 1
+                if ('confidence' in psd_properties):
+                    psd_confidence = psd_properties['conf']
+                psd_user = "";
+                if ('agent' in psd_properties):
+                    psd_user = psd_properties['agent']
+                if ('user' in psd_properties):
+                    psd_user = psd_properties['user']
                 psd_location = postsyn_data['Pos']
                 psd_export = {}
                 psd_export['body ID'] = -1
+                psd_export['user'] = psd_user
                 psd_export['confidence'] = float(psd_confidence)
                 psd_export['traced'] = bool("False")
                 psd_export['location'] = psd_location
@@ -122,7 +141,7 @@ if __name__ == '__main__':
                     psd_export['flagged'] = bool(pflagged)
                 psd_partners.append(psd_export)
         else:
-            print "cound not find psds for synapse " + syn_key        
+            print "warning: could not find psds for synapse " + syn_key        
         this_synapse_data["T-bar"] = this_tbar_data
         this_synapse_data["partners"] = psd_partners
         annot_syn_export.append(this_synapse_data);
