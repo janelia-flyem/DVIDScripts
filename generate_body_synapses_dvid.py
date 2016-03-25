@@ -103,8 +103,8 @@ if __name__ == '__main__':
                 export_synapse_data = {}
                 export_synapse_data["body ID"] = int(key)
                 export_synapse_data["body synapses"] = syn_count
-                export_synapse_data["body PSDs"] = tbar_count
-                export_synapse_data["body T-bars"] = psd_count
+                export_synapse_data["body PSDs"] = psd_count
+                export_synapse_data["body T-bars"] = tbar_count
                 export_synapse_data["location"] = this_loc
                 text_val = "orphan-link assignment. " + str(syn_count) + " Synapses, " + str(tbar_count) + " T-bars, " + str(psd_count) + " PSDs"                
                 export_synapse_data["text"] = text_val
