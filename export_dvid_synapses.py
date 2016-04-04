@@ -59,6 +59,9 @@ if __name__ == '__main__':
         if synapse["Kind"] == "PostSyn":
             # this is an array
             rels = synapse["Rels"]
+            if not rels:
+                print "Warning detected PSD not associated with Tbar at " + str(pos[0]) + "," + str(pos[1]) + "," + str(pos[2])
+                continue
             presynto = rels[0]
             presyncoord = presynto["To"]
             syn_id = str(presyncoord[0]) + "_" + str(presyncoord[1]) + "_" + str(presyncoord[2])
