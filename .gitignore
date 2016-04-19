@@ -68,3 +68,13 @@ target/
 # pyenv
 .python-version
 
+
+# Created files
+Dashboard/LogParser/neutu.json
+Dashboard/WebDisplay/bundle.js
+
+Dashboard/WebDisplay/node_modules
+
+# Old files
+Dashboard/LogParser/old/
+
