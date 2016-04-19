@@ -33,6 +33,11 @@ def calcactions(log):
 		"splits": 0,
 		"bodies": {},
 	}
+	initial = {
+		'merges': 0,
+		'splits': 0,
+		'working': 0,
+	} 
 	day_result = {}
 	current_assignment = None
 	assignment_chunk = []
@@ -50,11 +55,7 @@ def calcactions(log):
 					wt_day = nt.getworkingtimeforchunk(assignment_day_chunk)
 					assignment_day_chunk = []
 					if current_assignment not in day_result[line_date]['bodies']:
-							day_result[line_date]['bodies'][current_assignment] = {
-								'merges': 0,
-								'splits': 0,
-								'working': 0,
-							} 
+							day_result[line_date]['bodies'][current_assignment] = initial.copy()
 					day_result[line_date]['bodies'][current_assignment]['working'] += wt_day['working']
 			if "Assigned bookmark" in l:
 				# Retrieve bookmark
@@ -67,32 +68,20 @@ def calcactions(log):
 						assignment_day_chunk = []
 						result['bodies'][current_assignment]['working'] += wt['working']
 						if current_assignment not in day_result[line_date]['bodies']:
-							day_result[line_date]['bodies'][current_assignment] = {
-								'merges': 0,
-								'splits': 0,
-								'working': 0,
-							} 
+							day_result[line_date]['bodies'][current_assignment] =  initial.copy()
 						day_result[line_date]['bodies'][current_assignment]['working'] += wt_day['working']
 						# add time to old assignment
 					current_assignment = bid
 					if current_assignment not in result['bodies']:
 						# If not exists, create dictionary
-						result['bodies'][current_assignment] = {
-							'merges': 0,
-							'splits': 0,
-							'working': 0,
-						}
+						result['bodies'][current_assignment] = initial.copy()
 			if "Merge operation saved." in l:
 				result['merges'] += 1
 				day_result[line_date]['merges'] += 1
 				if current_assignment:
 					result['bodies'][current_assignment]['merges'] += 1
 					if current_assignment not in day_result[line_date]['bodies']:
-						day_result[line_date]['bodies'][current_assignment] = {
-							'merges': 0,
-							'splits': 0,
-							'working': 0,
-						}
+						day_result[line_date]['bodies'][current_assignment] = initial.copy()
 					day_result[line_date]['bodies'][current_assignment]['merges'] += 1
 
 			if "splitted" in l:
@@ -101,11 +90,7 @@ def calcactions(log):
 				if current_assignment:
 					result['bodies'][current_assignment]['splits'] += 1
 					if current_assignment not in day_result[line_date]['bodies']:
-							day_result[line_date]['bodies'][current_assignment] = {
-								'merges': 0,
-								'splits': 0,
-								'working': 0,
-							}
+							day_result[line_date]['bodies'][current_assignment] = initial.copy()
 					day_result[line_date]['bodies'][current_assignment]['splits'] += 1
 			if current_assignment:
 				assignment_chunk.append(l)
