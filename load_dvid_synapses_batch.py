@@ -28,7 +28,7 @@ import os
 
 # ------------------------ function to retrieve body ids -------------
 def load_dvid_synapses ( formatted_synapses, dvid_server, synapse_data_name, write_count ):
-    synapses_temp = "/groups/flyem/home/flyem/bin/python/dvid_synapse/synapses_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
+    synapses_temp = "synapses_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
     with open(synapses_temp, 'wt') as f:
         json.dump(formatted_synapses, f, indent=2)
     dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  synapse_data_name + "/elements"

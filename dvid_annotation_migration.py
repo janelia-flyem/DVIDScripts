@@ -21,7 +21,7 @@ import random
 
 # ------------------------ function to retrieve body ids -------------
 def load_dvid_annotations ( formatted_annots, dvid_server, dvid_uuid, annot_data_name, write_count ):
-    annotations_temp = "/groups/flyem/home/flyem/bin/python/dvid_annotation_migration/annot_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
+    annotations_temp = "annot_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
     with open(annotations_temp, 'wt') as f:
         json.dump(formatted_annots, f, indent=2)
     dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  annot_data_name + "/elements"
