@@ -1,3 +1,9 @@
-import lib from './es6-lib.js';
-console.log(lib.double(2));
-console.log(lib.addFive(2));
+import React from 'react'
+import { render } from 'react-dom'
+import App from './app'
+
+
+render(
+	<App />,
+  document.getElementById('content')
+);
