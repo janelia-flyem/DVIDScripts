@@ -6,7 +6,7 @@ import webDisplayApp from './reducers'
 import App from './app'
 // console.log(webDisplayApp)
 
-let store = window.my_store = createStore(webDisplayApp);
+let store = window.my_store = createStore(webDisplayApp, {}, window.devToolsExtension ? window.devToolsExtension() : undefined);
 
 render(
 	<Provider store={store}>

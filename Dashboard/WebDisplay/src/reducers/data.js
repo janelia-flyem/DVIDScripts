@@ -1,9 +1,7 @@
 
 const initialState = {
-  url: '',
-  payload: {}
 }
-const getData = (state = initialState, action) => {
+const dvidData = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_FROM_DVID':
       return Object.assign({}, state, {
@@ -15,4 +13,4 @@ const getData = (state = initialState, action) => {
   }
 }
 
-export default getData
+export default dvidData

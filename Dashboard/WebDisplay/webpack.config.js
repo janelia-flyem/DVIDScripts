@@ -13,6 +13,11 @@ module.exports = {
       query: {
         presets: ['es2015', 'react']
       }
-    }]
+    },
+    {
+      test: /node_modules\/.+\.(jsx|js)$/,
+      loader: 'imports?jQuery=jquery,$=jquery,this=>window'
+    }
+    ]
   }
 }

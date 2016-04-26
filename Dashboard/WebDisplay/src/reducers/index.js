@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import getData from './data'
+import dvidData from './data'
 
 const webDisplayApp = combineReducers({
-	getData
+	dvidData
 })
 
 export default webDisplayApp
