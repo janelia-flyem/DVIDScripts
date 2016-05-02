@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import {loadStatsFromDVID} from './actions'
 import {SingleStat, Panel} from './components'
-import {calcDailyMergeSplit} from './helpers/utils'
+import DaySnapshot from './components/day_snapshot'
+import {calcDailyMergeSplit, calcDailyMergeSplitChart, calcUserMergeSplitTable, calcDaySnapshotData} from './helpers/utils'
 import 'whatwg-fetch'
 
 
@@ -19,19 +20,73 @@ class App extends Component {
 	}
 
 	render() {
-		let overall, timeseries, user, merges, splits, dailyTable, valuesForTable
+		let overall, timeseries, user, merges, splits, dailyTable, dailyChart, userChart, daySnapshot, daySnapshotData, userMergeSplitTableValues, valuesForTable, valuesForChart
+		let classMap = {'working': 'DarkTurquoise', 'default': 'white'}
 		if (this.props.stats) {
 			overall = this.props.stats.overall
 			timeseries = this.props.stats.timeseries
 			user = this.props.stats.user
 			valuesForTable = calcDailyMergeSplit(timeseries.daily)
-			console.log(valuesForTable)
+			valuesForChart = calcDailyMergeSplitChart(timeseries.daily)
+			userMergeSplitTableValues = calcUserMergeSplitTable(user)
+			daySnapshotData = calcDaySnapshotData(user)
 			// TODO check if stats exist
 			merges = <SingleStat stat_name='Merges' stat_value={overall.merges} />
 			splits = <SingleStat stat_name='Splits' stat_value={overall.splits} />
 			dailyTable = <Panel size={6} title='Stats per Day' type='table' value={valuesForTable} />
+			dailyChart = <Panel size={6} title='Daily Chart' type='chart' value={valuesForChart} />
+			userChart = <Panel size={6} title='Total Merges and Splits by User' type='table' value={userMergeSplitTableValues} />
+			daySnapshot = <DaySnapshot barwidth={400}  data={daySnapshotData} height={15} colors={classMap} byweek={false}  />
 		}
-		return <div className='row' >{merges}{splits}{dailyTable} </div>
+		return (
+			<div>
+				<div className='row'>
+					<div className='col-lg-12'>
+						<div className='panel panel-default'>
+							<div className='panel-heading'>
+							<h3>Totals</h3> 
+							</div>
+							<div className='panel-body'>
+								{merges}{splits}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className='row'>
+					<div className='col-lg-12'>
+						<div className='panel panel-default'>
+							<div className='panel-heading'>
+							<h3>Daily Statistics</h3> 
+							</div>
+							<div className='panel-body'>
+								{dailyTable} {dailyChart}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className='row'>
+					<div className='col-lg-12'>
+						<div className='panel panel-default'>
+							<div className='panel-heading'>
+							<h3>User Statistics</h3> 
+							</div>
+							<div className='panel-body'>
+								{userChart} 
+								<div className='col-lg-6'>
+									<div className="panel panel-primary">
+										<div className="panel-heading">
+											Day Snapshot for Proofreaders
+										</div>
+										<div className="panel-body">{daySnapshot}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		)
 	}
 }
 
