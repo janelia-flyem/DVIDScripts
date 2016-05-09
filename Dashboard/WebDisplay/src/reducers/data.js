@@ -1,6 +1,6 @@
 
-const initialState = {
-}
+const initialState = {}
+
 const dvidData = (state = initialState, action) => {
   switch (action.type) {
     case 'LOAD_FROM_DVID':
