@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import {loadStatsFromDVID} from './actions'
+import isEmpty from 'lodash/isEmpty'
+import {loadStatsFromDVID, fetchStatsIfNeeded} from './actions'
 import {OverallSection, DailySection, UserSection} from './components'
 import 'whatwg-fetch'
 
@@ -9,18 +10,19 @@ import 'whatwg-fetch'
 class App extends Component {
 	componentDidMount() {
 		const dvid_api_url = `${this.props.dvid_url}/api/node/${this.props.uuid}/external_dashboard/key/dashboard`
-		fetch(dvid_api_url).then( (response) => {
-			return  response.json()
-		}).then( (r) => {
-			this.props.fetchFromDVID(dvid_api_url, r)
-			this.render()
-		})
+		this.props.getStats(dvid_api_url)
+		// fetch(dvid_api_url).then( (response) => {
+		// 	return  response.json()
+		// }).then( (r) => {
+		// 	this.props.fetchFromDVID(dvid_api_url, r)
+		// 	this.render()
+		// })
 	}
 
 	render() {
 		let overall, timeseries, user
 		let overallSection, dailySection, userSection
-		if (this.props.stats) {
+		if (!isEmpty(this.props.stats)) {
 			overall = this.props.stats.overall
 			timeseries = this.props.stats.timeseries
 			user = this.props.stats.user
@@ -41,19 +43,34 @@ class App extends Component {
 
 
 const mapStateToProps = function(state){
-	const {url, payload} = state.dvidData 
+	//const {url, payload} = state.dvidData 
+	const {selectedDVID, newdvidData} = state
+	const {isFetching,  didInvalidate, lastUpdated, stats} = newdvidData || {
+			isFetching: false,
+			didInvalidate: false,
+			lastUpdated: 0,
+			stats: {},
+		} 
 	return {
-		url,
-		stats: payload
+		url: selectedDVID,
+		stats: stats
 	}
 };
-
 const mapDispatchToProps = function(dispatch){
 	return {
-		fetchFromDVID: function(url, data){ 
-			dispatch(loadStatsFromDVID(url, data)) 
-		},
+		getStats: function(url) {
+			dispatch(fetchStatsIfNeeded(url))
+		}
 	}
-};
+}
+
+// const mapDispatchToProps = function(dispatch){
+// 	return {
+// 		fetchFromDVID: function(url, data){ 
+// 			dispatch(loadStatsFromDVID(url, data)) 
+// 		},
+// 		fetchStats,
+// 	}
+// };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)

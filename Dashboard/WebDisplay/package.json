@@ -11,6 +11,8 @@
     "babel-preset-react": "^6.3.13",
     "highcharts-more": "^0.1.2",
     "lodash": "^4.11.1",
+    "redux-logger": "^2.6.1",
+    "redux-thunk": "^2.1.0",
     "webpack": "^1.13.0"
   },
   "scripts": {
