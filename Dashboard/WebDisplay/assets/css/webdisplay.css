@@ -1,0 +1,8 @@
+#wrapper .navbar-default .navbar-brand {
+    color: #fff;
+    font-size: 2em;
+}
+
+#wrapper .row {
+	padding-top: 5px;
+}
