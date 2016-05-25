@@ -65,7 +65,7 @@ if __name__ == '__main__':
             # key is a bodyID
             # get synapses for bodyID like this http://emdata1.int.janelia.org:8500/api/node/44d42/mb6_synapses/label/10095139
             get_synapses_dvid = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + annotations_synapses + "/label/" + key
-            #print "get syn: " + get_synapses_dvid
+            print "get syn: " + get_synapses_dvid
             response_syn = urllib.urlopen(get_synapses_dvid, proxies=proxies).read()
             if response_syn == 'null':
                 print "No synapse data found for bodyID: " + key
@@ -97,19 +97,20 @@ if __name__ == '__main__':
                 z_locs.sort()
                 loc_num = len(z_locs);
                 mid = int(loc_num/2)
-                z_key = z_locs[mid]                
-                #print "Here " + key + " " + str(syn_count) + " " + str(tbar_count) + " " + str(psd_count) + " locnum " + str(loc_num) + " mid " + str(mid) + " zkey " + str(z_key)
-                this_loc = all_locations[z_key]
-                export_synapse_data = {}
-                export_synapse_data["body ID"] = int(key)
-                export_synapse_data["body synapses"] = syn_count
-                export_synapse_data["body PSDs"] = psd_count
-                export_synapse_data["body T-bars"] = tbar_count
-                export_synapse_data["location"] = this_loc
-                text_val = "orphan-link assignment. " + str(syn_count) + " Synapses, " + str(tbar_count) + " T-bars, " + str(psd_count) + " PSDs"                
-                export_synapse_data["text"] = text_val
-                export_synapse_data["body threshold"] = body_theshold
-                group_synapses.append(export_synapse_data)
+                if mid != 0:
+                    z_key = z_locs[mid]                
+                    #print "Here " + key + " " + str(syn_count) + " " + str(tbar_count) + " " + str(psd_count) + " locnum " + str(loc_num) + " mid " + str(mid) + " zkey " + str(z_key)
+                    this_loc = all_locations[z_key]
+                    export_synapse_data = {}
+                    export_synapse_data["body ID"] = int(key)
+                    export_synapse_data["body synapses"] = syn_count
+                    export_synapse_data["body PSDs"] = psd_count
+                    export_synapse_data["body T-bars"] = tbar_count
+                    export_synapse_data["location"] = this_loc
+                    text_val = "orphan-link assignment. " + str(syn_count) + " Synapses, " + str(tbar_count) + " T-bars, " + str(psd_count) + " PSDs"                
+                    export_synapse_data["text"] = text_val
+                    export_synapse_data["body threshold"] = body_theshold
+                    group_synapses.append(export_synapse_data)
 
     print "Done going through bodyIDs"
     syn_body_metadata = {}

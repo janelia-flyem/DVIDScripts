@@ -100,6 +100,8 @@ if __name__ == '__main__':
         this_tbar_data = {}
         this_tbar_data["status"] = "final"
         this_tbar_data["user"] = tbar_user
+        if ('conf' in tbar_properties):
+            tbar_confidence = tbar_properties["conf"]
         this_tbar_data['confidence'] = float(tbar_confidence)
         this_tbar_data['body ID'] = -1
         this_tbar_data['location'] = tbar_pos
@@ -132,6 +134,8 @@ if __name__ == '__main__':
                 psd_export = {}
                 psd_export['body ID'] = -1
                 psd_export['user'] = psd_user
+                if ('conf' in psd_properties):
+                    psd_confidence = psd_properties["conf"]
                 psd_export['confidence'] = float(psd_confidence)
                 psd_export['traced'] = bool("False")
                 psd_export['location'] = psd_location
@@ -144,7 +148,7 @@ if __name__ == '__main__':
                     psd_export['flagged'] = bool(pflagged)
                 psd_partners.append(psd_export)
         else:
-            print "warning: could not find psds for synapse " + syn_key        
+            print "warning: could not find psds for synapse " + syn_key + " conf: " + str(tbar_confidence)       
         this_synapse_data["T-bar"] = this_tbar_data
         this_synapse_data["partners"] = psd_partners
         annot_syn_export.append(this_synapse_data);
