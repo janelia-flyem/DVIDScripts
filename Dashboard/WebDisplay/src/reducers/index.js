@@ -1,23 +1,6 @@
 import { combineReducers } from 'redux'
 //import dvidData from './data'
-import {SELECT_DVID, INVALIDATE_DVID_DATA, REQUEST_STATS_FROM_DVID, RECEIVE_STATS_FROM_DVID} from '../actions'
-
-/*
-OLD WAY
- */
-const initialState = {}
-
-const dvidData = (state = initialState, action) => {
-  switch (action.type) {
-    case 'LOAD_FROM_DVID':
-      return Object.assign({}, state, {
-        url: action.url,
-        payload: action.payload,
-      })
-    default:
-      return state
-  }
-}
+import {SELECT_DVID, SELECT_PROOFREADER, INVALIDATE_DVID_DATA, REQUEST_STATS_FROM_DVID, RECEIVE_STATS_FROM_DVID} from '../actions'
 
 /*
 CORRECT WAY
@@ -39,7 +22,7 @@ const dvidDataInitialState = {
 	stats: {},
 }
 
-function newdvidData(state = dvidDataInitialState, action) {
+function dvidData(state = dvidDataInitialState, action) {
   switch (action.type) {
     case INVALIDATE_DVID_DATA:
 	    return Object.assign({}, state, {
@@ -62,12 +45,23 @@ function newdvidData(state = dvidDataInitialState, action) {
   }
 }
 
+function proofreader(state=null, action){
+	switch (action.type) {
+		case SELECT_PROOFREADER:
+			console.log("New proofreader")
+			if (action.proofreader != ' ') return action.proofreader
+			else return state 
+		default:
+			return state 
+	}
+}
+
 
 
 const webDisplayApp = combineReducers({
+ 	selectedDVID,
 	dvidData,
-	selectedDVID,
-	newdvidData
+	proofreader
 })
 
 export default webDisplayApp

@@ -1,9 +1,10 @@
 import React from 'react'
-import {calcDailyMergeSplit, calcDailyMergeSplitChart, calcUserMergeSplitTable, calcActivityTraceData, calcUserChartValues, calcUserBodyTimeChart} from '../helpers/utils'
+import {calcDailyMergeSplit, calcUserWorkingTimeValues, calcDailyMergeSplitChart, calcUserMergeSplitTable, calcActivityTraceData, calcUserChartValues, calcUserBodyTimeChart} from '../helpers/utils'
 import Griddle from 'griddle-react'
 import ReactHighcharts from 'react-highcharts' 
 import HighchartsMore from 'highcharts-more'
 import ActivityTrace from 'react-activity-trace'
+import pick from 'lodash/pick'
 HighchartsMore(ReactHighcharts.Highcharts)
 
 export const SingleStat = (props) => {
@@ -36,18 +37,39 @@ export const Panel = (props) => {
 	)
 }
 
+export const Picker = (props) => {
+    const { value, onChange, options, label } = props
+    console.log(props)
+    return (
+      <span>
+      	<label>{label}</label>
+        <select className='selectpicker' onChange={e => onChange(e.target.value)}
+                value={value}>
+          {options.map(option =>
+            <option value={option} key={option}>
+              {option}
+            </option>)
+          }
+        </select>
+      </span>
+    )
+}
 
 export const Section = (props) => {
-	let content
+	let content, headers
 	if (props.children) {
 		content = props.children
+	}
+	if (props.headers) {
+		headers = props.headers
 	}
 	return (
 		<div className='row'>
 			<div className='col-lg-12'>
 				<div className='panel panel-default'>
 					<div className='panel-heading'>
-					<h3>{props.title}</h3> 
+					<span className='panel-title'>{props.title}</span> 
+					{headers}
 					</div>
 					<div className='panel-body'>
 						{content}
@@ -94,13 +116,27 @@ export const DailySection = (props) => {
 }
 
 export const UserSection = (props) => {
-	let userMergeSplitTableValues, userChartValues, activityTraceData, bodyBoxPlotData
-	let userTable, activityTrace, userChart, userBodyBoxPlot
-	const user = props.user
+	let userMergeSplitTableValues, userChartValues, activityTraceData, bodyBoxPlotData, userWorkingTimeData
+	let userTable, activityTrace, userChart, userBodyBoxPlot, userWorkingTimeTable
+	let user = props.user
+	if (props.proofreader) {
+		user = pick(user, [props.proofreader])
+	}
 	userMergeSplitTableValues = calcUserMergeSplitTable(user)
 	userChartValues = calcUserChartValues(user)
 	activityTraceData = calcActivityTraceData(user)
 	bodyBoxPlotData = calcUserBodyTimeChart(user)
+	userWorkingTimeData = calcUserWorkingTimeValues(user)
+	let proofreaders = props.allProofreaders
+	proofreaders.sort()
+	proofreaders.unshift(' ')
+	const value = props.proofreader? props.proofreader: ' '
+	const proofreaderChoice = ( 
+		<div className='pull-right'>
+			<Picker label='Proofreader' value={value} onChange={props.onSelectProofreader} options={proofreaders} />
+		</div>
+	)
+
 	userTable = (
 		<Panel size={6} title='Total Statistics by User'>
 			<Griddle results={userMergeSplitTableValues} enableInfiniteScroll={true} useFixedHeader={true} bodyHeight={400} />
@@ -121,9 +157,11 @@ export const UserSection = (props) => {
 		</Panel>
 	)
 	let innerCharts = []
+	let idx = 0
 	userChartValues.forEach((item) => {
 		if (Object.keys(item).length > 0) {
-			innerCharts.push(<ReactHighcharts config={item} />)
+			innerCharts.push(<ReactHighcharts key={'user_chart_' + idx} config={item} />)
+			idx += 1
 		}
 	}) 
 	userChart = (
@@ -138,10 +176,15 @@ export const UserSection = (props) => {
 			<ReactHighcharts config={bodyBoxPlotData} />
 		</Panel>
 	)
+	userWorkingTimeTable = (
+		<Panel size={6} title='Total Statistics by User'>
+			<Griddle results={userWorkingTimeData} enableInfiniteScroll={true} useFixedHeader={true} bodyHeight={400} />
+		</Panel>
+	)
 
 	
 	return (
-		<Section title={props.title} >
+		<Section title={props.title} headers={proofreaderChoice} >
 			<Row>
 				{userTable} 
 				{activityTrace}
@@ -149,6 +192,9 @@ export const UserSection = (props) => {
 			<Row>
 				{userChart}
 				{userBodyBoxPlot}
+			</Row>
+			<Row>
+				{userWorkingTimeTable}
 			</Row>
 		</Section>
 	)

@@ -1,5 +1,6 @@
 
 import ss from 'summary-statistics'
+import reduce from 'lodash/reduce'
 
 export const calcDailyMergeSplit = (values) => {
 	const dates = Object.keys(values)
@@ -145,7 +146,7 @@ export const calcActivityTraceData = (userVals) => {
 	return daySnapshotData
 }
 
-export const  calcUserChartValues = (userVals) => {
+export const calcUserChartValues = (userVals) => {
 	let chartjsons = []
 	const users = Object.keys(userVals)
 	for (let i = 0; i < users.length; i++) {
@@ -203,5 +204,49 @@ export const  calcUserChartValues = (userVals) => {
 		})
 	}
 	return chartjsons
+}
+
+const secondsToHrMn = (seconds) => {
+	const hours = Math.floor(seconds / 3600)
+	const minutes = Math.floor((seconds - (hours * 3600))/ 60)
+	return `${hours}hr ${minutes}min`
+}
+
+const calcPercentWorking = (total, working) => {
+	if (total <= 0) return 0
+	else {
+		let percentWorking = (working/total) * 100
+		return percentWorking.toFixed(0)
+	}
+}
+
+const sumArray = (list) => {
+	const sum = reduce(list, (sum, n) => {
+		return sum + n
+	}, 0)
+	return sum
+}
+
+export const calcUserWorkingTimeValues = (userVals) => {
+	let workingTimeTable = []
+	const users = Object.keys(userVals)
+	users.forEach((user) =>{
+		let proofreader = user
+		const dates = Object.keys(userVals[user].timings)
+		dates.forEach((date) => {
+			const total = sumArray(userVals[user].timings[date].duration)
+			const working = userVals[user].timings[date].working_time
+			const percentworking = calcPercentWorking(total, working)
+			const result =  {
+				Proofreader: proofreader,
+				TotalTime: secondsToHrMn(total),
+				WorkingTime: secondsToHrMn(working),
+				PercentWorking: `${percentworking}%`,
+			}
+			proofreader = ''
+			workingTimeTable.push(result)
+		})
+	})
+	return workingTimeTable
 
 }

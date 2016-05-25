@@ -5,22 +5,9 @@ export const SELECT_DVID = 'SELECT_DVID'
 export const INVALIDATE_DVID_DATA = 'INVALIDATE_DVID_DATA'
 export const REQUEST_STATS_FROM_DVID = 'REQUEST_STATS_FROM_DVID'
 export const RECEIVE_STATS_FROM_DVID = 'RECEIVE_STATS_FROM_DVID'
+export const SELECT_PROOFREADER = 'SELECT_PROOFREADER'
 
 
-/*
-OLD WAY
- */
-export const loadStatsFromDVID = (url, payload) => {
-	return {
-		type: LOAD_FROM_DVID,
-		'url': url,
-		'payload': payload
-	}
-}
-
-/*
-CORRECT WAY
- */
 export const requestStatsFromDVID = (url) => {
 	return {
 		type: REQUEST_STATS_FROM_DVID,
@@ -51,7 +38,14 @@ export function invalidateDVIDData(dvid) {
   }
 }
 
-export function fetchStats(url) {
+export function selectProofreader(proofreader) {
+	return {
+		type: SELECT_PROOFREADER,
+		proofreader
+	}
+}
+
+function fetchStats(url) {
   return dispatch => {
     dispatch(requestStatsFromDVID(url))
     return fetch(url)
@@ -65,7 +59,7 @@ export function fetchStats(url) {
 }
 
 function shouldFetchStats(state, url) {
-  const stats = state.newdvidData
+  const stats = state.dvidData
   if (isEmpty(stats.stats)) {
     return true
   }

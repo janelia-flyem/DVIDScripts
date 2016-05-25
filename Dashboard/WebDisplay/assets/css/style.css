@@ -327,3 +327,7 @@ table.dataTable thead .sorting:after {
     margin: 15px 0;
 }
 
+.panel-title {
+    font-size: 1.5em;
+}
+
