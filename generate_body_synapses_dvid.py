@@ -20,18 +20,23 @@ import datetime
 import urllib
 import random
 import requests
+from libdvid import DVIDNodeService, ConnectionMethod
 
 # ------------------------ function to load/post body_synapse to DVID  -------------
-def load_body_synpase_dvid (body_synapses, dvid_server, keyvalue_name, key_name):
+def load_body_synpase_dvid (body_synapses, keyvalue_name, key_name, node_service):
     body_synapse_json = "body_synapse_tmp_" + str(random.randint(0,9999))  + ".json" 
     with open(body_synapse_json, 'wt') as f:
         json.dump(body_synapses, f, indent=2)
-    dvid_request_url = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + keyvalue_name + "/key/" + key_name
-    print "dvid post url: " + dvid_request_url
     data = open(body_synapse_json,'rb').read()
-    res = requests.post(url=dvid_request_url,data=data)
+    dvid_request_url = keyvalue_name + "/key/" + key_name
+    # print "dvid post url: " + dvid_request_url
+    # data = json.dumps(body_synapses)
+    # print type(data)
+    # print type(body_synapses)
+    node_service.put(body_synapses, key_name, data)
     print "Done posting"
     os.remove(body_synapse_json)
+
 
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
@@ -48,14 +53,24 @@ if __name__ == '__main__':
     annotations_keyvalue = sys.argv[5]
     body_synapses_key = sys.argv[6]
 
-    proxies = {'http': 'http://' + dvid_server + '/'}
+    # Libdvid has problems with trailing slashes in urls
+    if dvid_server.endswith('/'):
+        dvid_server = dvid_server[0:-1]
+    http_dvid_server = "http://{0}".format(dvid_server)    
+    node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'generate body synapses')
+    response = node_service.get_keys(body_annotations_name)
 
-    dvid_get_annotated_bodies = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + body_annotations_name + "/keys"
 
-    print "dvid_url " + dvid_get_annotated_bodies
+    # proxies = {'http': 'http://' + dvid_server + '/'}
 
-    response = urllib.urlopen(dvid_get_annotated_bodies, proxies=proxies).read()
-    bodies_annot_data = json.loads(response)
+    # dvid_get_annotated_bodies = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + body_annotations_name + "/keys"
+
+    # print "dvid_url " + dvid_get_annotated_bodies
+
+    # response = urllib.urlopen(dvid_get_annotated_bodies, proxies=proxies).read()
+
+
+    bodies_annot_data = list(response)
 
     group_synapses = []
     body_theshold = 0
@@ -64,9 +79,11 @@ if __name__ == '__main__':
             #print "key " + key
             # key is a bodyID
             # get synapses for bodyID like this http://emdata1.int.janelia.org:8500/api/node/44d42/mb6_synapses/label/10095139
-            get_synapses_dvid = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + annotations_synapses + "/label/" + key
-            print "get syn: " + get_synapses_dvid
-            response_syn = urllib.urlopen(get_synapses_dvid, proxies=proxies).read()
+            get_synapses_dvid = annotations_synapses + "/label/" + key
+            response_syn = node_service.custom_request( get_synapses_dvid, "", ConnectionMethod.GET )
+            # get_synapses_dvid = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + annotations_synapses + "/label/" + key
+            # print "get syn: " + get_synapses_dvid
+            # response_syn = urllib.urlopen(get_synapses_dvid, proxies=proxies).read()
             if response_syn == 'null':
                 print "No synapse data found for bodyID: " + key
             else:
@@ -128,5 +145,5 @@ if __name__ == '__main__':
     final_json_export['data'] = group_synapses
     final_json_export['metadata'] = syn_body_metadata
 
-    load_body_synpase_dvid (final_json_export, dvid_server, annotations_keyvalue, body_synapses_key)
+    load_body_synpase_dvid (final_json_export, annotations_keyvalue, body_synapses_key, node_service)
     sys.exit(1)
