@@ -14,20 +14,24 @@ import sys
 import os
 import socket
 import datetime
-import urllib
+## import urllib
 import random
 import requests
+from libdvid import DVIDNodeService, ConnectionMethod
 # ------------------------ function to load/post body_synapse to DVID  -------------
-def load_assignment_dvid (json_data, dvid_server, dvid_uuid, keyvalue_name, key_name):
-    assign_json = "assign_tmp_" + key_name + "_" + str(random.randint(0,9999))  + ".json"
-    with open(assign_json, 'wt') as f:
-        json.dump(json_data, f, indent=2)
-    dvid_request_url = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + keyvalue_name + "/key/" + key_name
-    print "dvid post url: " + dvid_request_url
-    data = open(assign_json,'rb').read()
-    res = requests.post(url=dvid_request_url,data=data)
-    print "Done posting " + assign_json 
-    os.remove(assign_json)
+def load_assignment_dvid (json_data, node_service, keyvalue_name, key_name):
+    data = json.dumps(json_data)
+    node_service.put(keyvalue_name, key_name, data)
+    print "Done posting {} : {}".format(keyvalue_name, key_name) 
+    #assign_json = "assign_tmp_" + key_name + "_" + str(random.randint(0,9999))  + ".json"
+    #with open(assign_json, 'wt') as f:
+    #    json.dump(json_data, f, indent=2)
+    #dvid_request_url = keyvalue_name + "/key/" + key_name
+    #print "dvid post url: " + dvid_request_url
+    #data = open(assign_json,'rb').read()
+    #res = requests.post(url=dvid_request_url,data=data)
+    #print "Done posting " + assign_json 
+    #os.remove(assign_json)
 
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
@@ -48,16 +52,22 @@ if __name__ == '__main__':
     
     lookup_bodyid = {}
     
-    proxies = {'http': 'http://' + dvid_server + '/'}    
-    dvid_get_body_synapse = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + bodysyn_key_val + "/key/" + bodysyn_key
-    print "get body synapse " + dvid_get_body_synapse
+    ## Do I comment out proxies?
+    #proxies = {'http': 'http://' + dvid_server + '/'}    
+    #dvid_get_body_synapse = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + bodysyn_key_val + "/key/" + bodysyn_key
+    #print "get body synapse " + dvid_get_body_synapse
+
+    if dvid_server.endswith('/'):
+        dvid_server = dvid_server[0:-1]
+    http_dvid_server = "http://{0}".format(dvid_server)
+    node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'generate dvid assignment')
+    dvid_get_body_synapse = bodysyn_key_val + "/key/" + bodysyn_key 
     
-    response = urllib.urlopen(dvid_get_body_synapse, proxies=proxies).read()
+    response = node_service.custom_request( dvid_get_body_synapse, '', ConnectionMethod.GET )
 
     # need error check here for empty response
     
     body_synapse_data = json.loads(response)
-
     if type(body_synapse_data) is dict:
         print "Using body synapse format, dict"
         bk_data = body_synapse_data["data"]

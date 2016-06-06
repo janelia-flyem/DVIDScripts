@@ -78,3 +78,5 @@ Dashboard/WebDisplay/node_modules
 # Old files
 Dashboard/LogParser/old/
 
+# backup
+*.bak
