@@ -24,19 +24,16 @@ from libdvid import DVIDNodeService, ConnectionMethod
 
 # ------------------------ function to load/post body_synapse to DVID  -------------
 def load_body_synpase_dvid (body_synapses, keyvalue_name, key_name, node_service):
-    body_synapse_json = "body_synapse_tmp_" + str(random.randint(0,9999))  + ".json" 
-    with open(body_synapse_json, 'wt') as f:
-        json.dump(body_synapses, f, indent=2)
-    data = open(body_synapse_json,'rb').read()
-    dvid_request_url = keyvalue_name + "/key/" + key_name
-    # print "dvid post url: " + dvid_request_url
-    # data = json.dumps(body_synapses)
-    # print type(data)
-    # print type(body_synapses)
-    node_service.put(body_synapses, key_name, data)
+    data = str(json.dumps(body_synapses))
+    node_service.put(keyvalue_name, key_name, data)
     print "Done posting"
-    os.remove(body_synapse_json)
+    
 
+    #
+    # dvid_request_url = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + keyvalue_name + "/key/" + key_name
+    # 
+    # res = requests.post(url=dvid_request_url,data=data)
+    # os.remove(body_synapse_json)
 
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
