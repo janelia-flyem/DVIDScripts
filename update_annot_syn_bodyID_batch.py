@@ -11,17 +11,16 @@ script that will update an annotations synapse json file with new bodies ids ret
 import json
 import sys
 import requests
-# import urllib
+import urllib
 import random
 import os
-from libdvid import DVIDNodeService, ConnectionMethod
 
 # ------------------------ function to retrieve body ids -------------
-def get_dvid_body_ids( synapse_locations, node_service, bodylabeldata, write_count ):
+def get_dvid_body_ids( synapse_locations, dvid_server, bodylabeldata, write_count ):
     coords_temp = "coords_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
     with open(coords_temp, 'wt') as f:
         json.dump(synapse_locations, f, indent=2)
-    dvid_request_url= labelblk + "/labels"
+    dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  labelblk + "/labels"
     print "dvid url " + dvid_request_url    
     data = open(coords_temp,'rb').read()
     res = requests.get(url=dvid_request_url,data=data)
@@ -45,15 +44,6 @@ if __name__ == '__main__':
     labelblk = sys.argv[5]
     batch_count = int(sys.argv[6])
 
-    if dvid_server.endswith('/'):
-        dvid_server = dvid_server[0:-1]
-    http_dvid_server = "http://{0}".format(dvid_server)
-    node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'dvid annotation migration')
-
-    #??????????????????
-    response = node_service.body_exists( something )
-    #??????????????????
-
     print "opening json"
     jsondata = json.loads(open(inputfilename, 'rt').read())
     print "done reading json"
@@ -67,7 +57,7 @@ if __name__ == '__main__':
         print "this file is from a newer Raveler than I can handle!"
         sys.exit(1)
 
-    # proxies = {'http': 'http://' + dvid_server + '/'}
+    proxies = {'http': 'http://' + dvid_server + '/'}
     
     synapse_locations = []
     write_count = 0
