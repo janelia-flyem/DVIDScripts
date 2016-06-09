@@ -59,6 +59,8 @@ def gettimestamp(line):
 			return datetime.strptime(timestamp, timestampformat)
 		except ValueError:
 			return None
+	except TypeError:
+		return None
 
 def getintervals(timestamps):
 	"""
@@ -78,7 +80,7 @@ def sortloglist(loglist):
 	# Remove the current file and reinsert it at the end
 	loglist.remove(currentlogfilename)
 	# Ignore files that aren't logs
-	loglist = [ l for l in loglist if currentlogfilename in l]
+	loglist = [ l for l in loglist if currentlogfilename in l and not l.endswith('swp')]
 	# Sort with lowest number log first (format log.txt.1)
 	sortedlist = sorted(loglist, key = lambda i: int(i.split('.')[-1]))
 	sortedlist.reverse()
@@ -232,7 +234,7 @@ def daychunks(lines):
 		#strip off loglevel
 		l = line[loglevellength:].rstrip()
 		#check if line starts with timestamp, if not discard
-		if (date_pattern.match(l)):
+		if l.startswith('20') and (date_pattern.match(l))  and not l.endswith('Autosave triggered.'):
 			if oldline:
 				# when to begin a new chunk?
 				if not sameday(oldline, l):

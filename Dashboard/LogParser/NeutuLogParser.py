@@ -183,10 +183,10 @@ def parsegeneral(logs):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description="Parse Neutu Logs for Progress Data")
-	parser.add_argument('--log_directory', 
+	parser.add_argument('--log-directory', 
 		dest='directory', action='store', help='Directory that contains log files')
 	parser.add_argument('--output', 
-		dest='output_file', action='store', default='neutu.json', help='Filename for output Default: neutu.json')
+		dest='output-file', action='store', default='neutu.json', help='Filename for output Default: neutu.json')
 	#parser.add_argument('--multiple_datasets', dest='use_multiple_datasets', action='store_true', default=False, help='Flag, separate stats by DVID dataset.\
 	# Use this if you have more than one DVID dataset you are using \
 	# (but not if you have many nodes for the same dataset)')
