@@ -17,9 +17,7 @@ import sys
 import os
 import socket
 import datetime
-import urllib
 import random
-import requests
 from libdvid import DVIDNodeService, ConnectionMethod
 
 # ------------------------ function to load/post body_synapse to DVID  -------------
