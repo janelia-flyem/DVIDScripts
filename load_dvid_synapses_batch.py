@@ -29,7 +29,7 @@ from libdvid import DVIDNodeService, ConnectionMethod
 def load_dvid_synapses (node_service, formatted_synapses, synapse_data_name):
     dvid_request_url = synapse_data_name + "/elements"
     print "dvid url " + dvid_request_url    
-    data = json.loads(formatted_synapses)
+    data = json.dumps(formatted_synapses)
     res = requests.post(url=dvid_request_url,data=data)
     node_service.custom_request(dvid_request_url, data, ConnectionMethod.POST)
  
