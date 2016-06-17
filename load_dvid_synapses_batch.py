@@ -21,26 +21,18 @@ python ./load_dvid_synapses_batch.py annotations-synapse_fib25_dvid_e402c_201512
 # ------------------------- imports -------------------------
 import json
 import sys
-import requests
-import urllib
 import random
 import os
+from libdvid import DVIDNodeService, ConnectionMethod
 
 # ------------------------ function to retrieve body ids -------------
-def load_dvid_synapses ( formatted_synapses, dvid_server, synapse_data_name, write_count ):
-    synapses_temp = "synapses_for_dvid_batch_" + str(write_count) + "_" + str(random.randint(0,9999))  + ".json"
-    with open(synapses_temp, 'wt') as f:
-        json.dump(formatted_synapses, f, indent=2)
-    dvid_request_url= "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" +  synapse_data_name + "/elements"
+def load_dvid_synapses (node_service, formatted_synapses, synapse_data_name):
+    dvid_request_url = synapse_data_name + "/elements"
     print "dvid url " + dvid_request_url    
-    data = open(synapses_temp,'rb').read()
+    data = json.loads(formatted_synapses)
     res = requests.post(url=dvid_request_url,data=data)
-    #don't need these since I don't need the output coming back from dvid
-    #thisbodylabeldata = json.loads(res.text)
-    #print "this body labels " + str(len(thisbodylabeldata))
-    #bodylabeldata.extend(thisbodylabeldata)
-    # remove temp json file
-    #os.remove(synapses_temp)
+    node_service.custom_request(dvid_request_url, data, ConnectionMethod.POST)
+ 
 
 
 # ------------------------- script start -------------------------
@@ -65,6 +57,11 @@ if __name__ == '__main__':
     print "done reading json"
     print "batch load num " + str(batch_count)
 
+    if dvid_server.endswith('/'):
+        dvid_server = dvid_server[0:-1]
+    http_dvid_server = "http://{0}".format(dvid_server)    
+    node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'load dvid synapses')
+
     metadata = jsondata["metadata"]
     if metadata["description"] != "synapse annotations":
         print "not a synpase annotation file!" 
@@ -72,8 +69,6 @@ if __name__ == '__main__':
     if metadata["file version"] > 1:
         print "this file is from a newer Raveler than I can handle!"
         sys.exit(1)
-
-    proxies = {'http': 'http://' + dvid_server + '/'}
     
     synapses_data = []
     write_count = 0
@@ -151,7 +146,7 @@ if __name__ == '__main__':
             if (syn_count == batch_count):
                 print "syn count P " + str(syn_count) + " eq batch count " + str(batch_count)
                 write_count += 1
-                load_dvid_synapses(synapses_data,dvid_server,synapse_data_name,write_count)
+                load_dvid_synapses(node_service, synapses_data, synapse_data_name)
                 print "request count " + str(write_count)
                 syn_count = 0
                 synapses_data = []
@@ -163,7 +158,7 @@ if __name__ == '__main__':
         if (syn_count == batch_count):
             print "syn count T " + str(syn_count) +" eq batch count " + str(batch_count)
             write_count += 1
-            load_dvid_synapses(synapses_data,dvid_server,synapse_data_name,write_count)
+            load_dvid_synapses(node_service, synapses_data, synapse_data_name)
             print "request count " + str(write_count)
             syn_count = 0
             synapses_data = []
@@ -171,7 +166,7 @@ if __name__ == '__main__':
 
     # write out remaining synapses
     write_count += 1
-    load_dvid_synapses(synapses_data,dvid_server,synapse_data_name,write_count)
+    load_dvid_synapses(node_service, synapses_data, synapse_data_name)
     #bodylabeldata.extend(ret_body_ids)
     syn_count = 0
     synapses_data = []
