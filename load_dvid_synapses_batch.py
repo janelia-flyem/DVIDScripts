@@ -12,7 +12,7 @@ python ./load_dvid_synapses_batch.py annotations-synapse_fib25_dvid_e402c_201512
     dvid_server - dvid server name
     dvid_uuid - node uuid
     synapse_data_name - annotation data type instance name on dvid server/node
-    agent_val - value to populate required agent property for synapses. agent is the script(if synapses are predicted), individual, group of individuals that created the synapse.
+    user_val - value to populate required user property for synapses. user is the script(if synapses are predicted), individual, group of individuals that created the synapse.
     batch_count - number of synapses to upload to DVID at a time. A value too large could timeout the server request
     synapse_start - number for synapses to start at. Useful if your synapses are seperated across numerous files.
 
@@ -25,6 +25,7 @@ import requests
 import urllib
 import random
 import os
+import datetime
 
 # ------------------------ function to retrieve body ids -------------
 def load_dvid_synapses ( formatted_synapses, dvid_server, synapse_data_name, write_count ):
@@ -54,10 +55,12 @@ if __name__ == '__main__':
     dvid_server = sys.argv[2]
     dvid_uuid = sys.argv[3]
     synapse_data_name = sys.argv[4]
-    agent_val = str(sys.argv[5])
+    user_val = str(sys.argv[5])
     batch_count = int(sys.argv[6])    
     synapse_start = int(sys.argv[7])
 
+    start_time = datetime.datetime.now().strftime("%d-%B-%Y %H:%M")
+    print "start time " + start_time
     #y_adjust = int(sys.argv[3])
     # not much validation here!
     print "opening json"
@@ -87,11 +90,11 @@ if __name__ == '__main__':
         tbar_json_data = synapse["T-bar"]
         tbar_location = tbar_json_data["location"]        
         tbar_count +=1
-        synapse_name = "Syn" + str(tbar_count);
+        synapse_name = "Syn" + str(tbar_count)
         presyn_data = {}
         tbar_tags = []
         tbar_props = {}
-        tbar_props["agent"] = agent_val
+        tbar_props["user"] = user_val
         tbar_tags.append(synapse_name)
         if ('convergent' in tbar_json_data):
             print "T-bar is convergent"
@@ -118,7 +121,7 @@ if __name__ == '__main__':
             postsyn_data = {}
             psd_tags = []
             psd_props = {}
-            psd_props["agent"] = agent_val
+            psd_props["user"] = user_val
             #post syn relation to T-bar
             psd_rels_data = []
             post_syn_rel = {}
@@ -176,5 +179,7 @@ if __name__ == '__main__':
     syn_count = 0
     synapses_data = []
     #print "bodys " + str(len(bodylabeldata))
+    stop_time = datetime.datetime.now().strftime("%d-%B-%Y %H:%M")
+    print "stop time " + stop_time
     sys.exit(1)
 # end script
