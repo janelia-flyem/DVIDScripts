@@ -16,12 +16,12 @@ import sys
 import os
 import socket
 import datetime
-import urllib
+from libdvid import DVIDNodeService, ConnectionMethod
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
 
-    if len(sys.argv) < 6:
-        print "usage: dvid_server dvid_node_uuid synapse_datatype_name offsett_coord(x_y_z) size(x_y_z) outputfilename"
+    if len(sys.argv) != 6:
+        print "usage: dvid_server dvid_node_uuid synapse_datatype_name tagname outputfilename"
         sys.exit(1)
 
     dvid_server = sys.argv[1]
@@ -30,13 +30,20 @@ if __name__ == '__main__':
     tag_name = sys.argv[4]
     outputfilename = sys.argv[5]
 
-    proxies = {'http': 'http://' + dvid_server + '/'}
+    if dvid_server.endswith('/'):
+        dvid_server = dvid_server[0:-1]
+    http_dvid_server = "http://{0}".format(dvid_server)    
+    node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'export bookmarks')
 
-    dvid_request_synapses = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + datatype_name + "/tag/" + tag_name
-    print "dvid_url: " + dvid_request_synapses
-    response = urllib.urlopen(dvid_request_synapses, proxies=proxies).read()
+    tag_endpoint = "{0}/tag/{1}".format(datatype_name, tag_name)
+    response = node_service.custom_request( tag_endpoint, '', ConnectionMethod.GET )
+
     #print response
     bookmarkdata = json.loads(response)
+
+    if not bookmarkdata:
+	print "Error, no data for label: {0}".format(tag_name)
+	exit(1)
     
     export_bookmarks = []
     
@@ -55,8 +62,8 @@ if __name__ == '__main__':
             comment = props["comment"]
             this_bkm_data["comment"] = comment
         this_bkm_data["text"] = tags[0]
-        this_bkm_data["checked"] = bool("True")
-        this_bkm_data["custom"] = bool("True")
+        this_bkm_data["checked"] = True
+        this_bkm_data["custom"] = True
         export_bookmarks.append(this_bkm_data)
 
 
