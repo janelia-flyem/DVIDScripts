@@ -1,12 +1,12 @@
 #!/bin/env
 """
 
-export body synapses from dvid into annotations synapse json format
+export all synapses on and connected to a targeted bodyID/labelID from dvid into annotations synapse json format
 
-lau, 01/16 first version of script
+lau, 06/16 first version of script
 
 example:
-python export_body_synapses.py emdata1:8500 3ca7f synapses 32818 export_test.json
+python ./export_body_synapses.py emdata2:7000 647edb annot_synapse_060616 156 segmentation segmentation-labelvol_annotations ~/156.json
 
 """
 
@@ -28,6 +28,7 @@ def get_dvid_label_id ( node_service, labelblk, coord_string ):
     labeldata = json.loads(label_response)
     return labeldata;
 
+# ---- Requires dvid body annotation keyvalue and target label_id, Returns human annotated body name string if it exists. Returns Unknown if one can't be found.
 def get_annotated_bodyname ( node_service, bodyannotations, label_id ):
     this_body_name = "Unknown"
     dvid_request_body_annot = "{0}/key/{1}".format(bodyannotations,label_id)
@@ -45,6 +46,7 @@ def get_annotated_bodyname ( node_service, bodyannotations, label_id ):
         this_body_name ="Unknown"
     return this_body_name;
 
+# ---- Requires name of dvid synpase datatype and a coordinate of the synapse in the format (x_y_z). Returns json dvid synapse object.
 def get_dvid_synapse ( node_service, synapse_datatype_name, synapse_coord):
     dvid_request_get_synapse = "{0}/elements/1_1_1/{1}".format(synapse_datatype_name,synapse_coord)
     print "GET SYNAPSE " + dvid_request_get_synapse
@@ -56,8 +58,8 @@ def get_dvid_synapse ( node_service, synapse_datatype_name, synapse_coord):
 # ------------------------- script start -------------------------
 if __name__ == '__main__':
 
-    if len(sys.argv) < 6:
-        print "usage: dvid_server dvid_node_uuid synapse_datatype_name labelID outputfilename"
+    if len(sys.argv) < 7:
+        print "usage: dvid_server dvid_node_uuid synapse_datatype_name labelID labelblk_name body_annot_name outputfilename"
         sys.exit(1)
 
     dvid_server = sys.argv[1]
