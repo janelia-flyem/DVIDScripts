@@ -42,15 +42,18 @@ if __name__ == '__main__':
         dvid_server = dvid_server[0:-1]
     http_dvid_server = "http://{0}".format(dvid_server)
     node_service = DVIDNodeService(dvid_server, dvid_uuid, 'umayaml@janelia.hhmi.org', 'export dvid synapses')
-    dvid_request_synapses =  "{0}/elements/{1}/{2}".format(synapse_datatype_name, size, offsett_coord)
-
+    dvid_request_synapses =  "{0}/elements/{1}/{2}".format(synapse_datatype_name, size, offsett_coord)    
     response = node_service.custom_request( dvid_request_synapses, "", ConnectionMethod.GET )
-    # proxies = {'http': 'http://' + dvid_server + '/'}
 
+    if response == "null":
+        print "No synapses found for " + dvid_request_synapses
+        sys.exit(1)
+
+    # proxies = {'http': 'http://' + dvid_server + '/'}
     # dvid_request_synapses = "http://" + dvid_server + "/api/node/" + dvid_uuid + "/" + synapse_datatype_name + "/elements/" + size + "/" + offsett_coord
     # print "dvid_url: " + dvid_request_synapses
     # response = urllib.urlopen(dvid_request_synapses, proxies=proxies).read()
-    #print response
+        
     synapsedata = json.loads(response)
     
     export_synapse_tbars = {}
