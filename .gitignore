@@ -80,3 +80,6 @@ Dashboard/LogParser/old/
 
 # backup
 *.bak
+
+# Data for metrics calc that should actually be in DVID
+3DMetrics/50_50/
