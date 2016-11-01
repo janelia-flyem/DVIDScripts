@@ -10,6 +10,7 @@ import 'whatwg-fetch'
 class App extends Component {
 	componentDidMount() {
 		const dvid_api_url = `${this.props.dvid_url}/api/node/${this.props.uuid}/external_dashboard/key/dashboard`
+		console.log(dvid_api_url)
 		this.props.getStats(dvid_api_url)
 	}
 

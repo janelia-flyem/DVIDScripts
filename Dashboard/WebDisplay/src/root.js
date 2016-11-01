@@ -13,7 +13,7 @@ const store = createStore(webDisplayApp, {}, applyMiddleware(thunkMiddleware))
 
 render(
 	<Provider store={store}>
-		<App uuid={'edc03'} dvid_url={'http://emdata1.int.janelia.org:8500'} />
+		<App uuid={'99ef22'} dvid_url={'http://emdata1.int.janelia.org:8500'} />
 	</Provider>,
 	document.getElementById('content')
 );
